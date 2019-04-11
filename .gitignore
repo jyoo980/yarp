@@ -1,2 +1,5 @@
 .DS_Store
 *.bak*
+*.rkt~
+compiled/
+*.rkt#2#
