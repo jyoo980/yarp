@@ -3,9 +3,10 @@
 (print-only-errors)
 
 ;; Expr ::= <num>
-;;       | (+ <Expr> <Expr>)
-;;       | (- <Expr> <Expr>)
-;;       | (* <Expr> <Expr>)
+;;       |  <bool>
+;;       |  (+ <Expr> <Expr>)
+;;       |  (- <Expr> <Expr>)
+;;       |  (* <Expr> <Expr>)
 
 (define-type Expr
   [num (? number?)]
