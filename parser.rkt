@@ -34,17 +34,6 @@
 (test (valid-id? 'let) false)
 (test (valid-id? 'foo) true)
 
-;; parse-binop : Symbol Expr Expr -> Expr
-;; parses a grammar of form (OP <Expr> <Expr>) into its correct representation
-(define (parse-binop op lhs rhs)
-  (cond [(symbol=? op '+) (add lhs rhs)]
-        [(symbol=? op '*) (mult lhs rhs)]
-        [(symbol=? op '-) (sub lhs rhs)]))
-
-(test (parse-binop '+ (num 1) (num 2)) (add (num 1) (num 2)))
-(test (parse-binop '* (num 1) (num 2)) (mult (num 1) (num 2)))
-(test (parse-binop '- (num 1) (num 2)) (sub (num 1) (num 2)))
-
 ;; parse : String -> Expr
 ;; parses a sequence of strings to an Expr
 (define (parse sexp)
@@ -52,7 +41,9 @@
     [(? number?) (num sexp)]
     [(? boolean?) (bool sexp)]
     [(? valid-id?) (id sexp)]
-    [(list (? symbol? op) lhs rhs) (parse-binop op (parse lhs) (parse rhs))]
+    [(list '+ lhs rhs) (add (parse lhs) (parse rhs))]
+    [(list '- lhs rhs) (sub (parse lhs) (parse rhs))]
+    [(list '* lhs rhs) (mult (parse lhs) (parse rhs))]
     [(list 'let (list (? valid-id? id) binding-expr) body-expr)
      (let-expr id (parse binding-expr) (parse body-expr))]
     [_ (error "Unable to parse string: " sexp)]))
