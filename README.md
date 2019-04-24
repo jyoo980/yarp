@@ -8,10 +8,10 @@ Below is the grammar that has been implemented in the parser so far
 
 ```
 <Expr> ::= <num>
-		|  <bool>
-		|  <id>
-		| '(' '+' <Expr> <Expr> ')'
-		| '(' '-' <Expr> <Expr> ')'
-		| '(' '*' <Expr> <Expr> ')'
-		| '(' 'let' '[' <id> <Expr> ']' <Expr> ')' 
+	|  <bool>
+	|  <id>
+	| '(' '+' <Expr> <Expr> ')'
+	| '(' '-' <Expr> <Expr> ')'
+	| '(' '*' <Expr> <Expr> ')'
+	| '(' 'let' '[' <id> <Expr> ']' <Expr> ')' 
 ```
