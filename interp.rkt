@@ -31,23 +31,29 @@
 (test (subst 'y (num 4) (add (id 'x) (id 'y))) (add (id 'x) (num 4)))
 (test (subst 'x  (num 4) (add (id 'x) (num 4))) (add (num 4) (num 4)))
 
-;; interp : String -> <TODO>
+;; interp : String -> Number | Boolean
 ;; interpreter for the Expr grammar
 (define (interp expr)
   (type-case Expr expr
     [num (n) n]
     [bool (b) b]
-    [id (name) name]
+    [id (name) (error "Unbound identifier: " name)]
     [add (lhs rhs) (+ (interp lhs) (interp rhs))]
     [mult (lhs rhs) (* (interp lhs) (interp rhs))]
     [sub (lhs rhs) (- (interp lhs) (interp rhs))]
-    [let-expr (name val body) 'TODO]))
+    [let-expr (name val body)
+              (interp (subst name
+                             (num (interp val))
+                             body))]))
 
 (test (interp (num 1)) 1)
 (test (interp (add (num 1) (num 2))) (+ 1 2))
 (test (interp (mult (add (num 1) (num 2)) (num 44))) (* (+ 1 2) 44))
 (test (interp (bool #t)) #t)
 (test (interp (bool #f)) #f)
-(test (interp (id 'fun)) 'fun)
 (test (interp (sub (num 1) (num 3))) -2)
+(test (interp (let-expr 'foo (num 2) (num 5))) 5)
+(test (interp (let-expr 'foo (num 5) (add (id 'foo) (num 11)))) 16)
+(test (interp (parse '(let [x (let [y 2] y)] (+ x 11)))) 13)
+(test/exn (interp (id 'fun)) "")
 
