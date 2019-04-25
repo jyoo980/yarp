@@ -49,11 +49,14 @@
                                        (num (inner-interp val))
                                        body))]
               [call-expr (fun-name arg-expr)
-                         (type-case FunDef (lookup-fundef fun-name fundefs)
-                           [fundef (name arg body)
-                                   (inner-interp (subst arg
-                                                        (num (inner-interp arg-expr))
-                                                        body))])]))]
+                         (interp-fun fun-name arg-expr)]))
+          
+          (define (interp-call name arg-expr)
+            (type-case FunDef (lookup-fundef name fundefs)
+              [fundef (ident arg body)
+                      (inner-interp (subst arg
+                                           (num (inner-interp arg-expr))
+                                           body))]))]
     (inner-interp expr)))
 
 (test (interp (num 1) TEST-FUNDEFS) 1)
