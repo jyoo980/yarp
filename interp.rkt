@@ -25,7 +25,9 @@
                             body-expr)
                   (let-expr bound-id
                             (subst named-expr target-id target-val)
-                            (subst body-expr target-id target-val)))]))
+                            (subst body-expr target-id target-val)))]
+    [call-expr (fun-name fun-args)
+               (call-expr fun-name (subst target-id target-val fun-args))]))
 
 (test (subst 'x (num 1) (add (num 1) (num 4))) (add (num 1) (num 4)))
 (test (subst 'y (num 4) (add (id 'x) (id 'y))) (add (id 'x) (num 4)))
@@ -44,7 +46,8 @@
     [let-expr (name val body)
               (interp (subst name
                              (num (interp val))
-                             body))]))
+                             body))]
+    [call-expr (fun-name arg) 'TODO]))
 
 (test (interp (num 1)) 1)
 (test (interp (add (num 1) (num 2))) (+ 1 2))
