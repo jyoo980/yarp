@@ -35,27 +35,37 @@
 
 ;; interp : String -> Number | Boolean
 ;; interpreter for the Expr grammar
-(define (interp expr)
-  (type-case Expr expr
-    [num (n) n]
-    [bool (b) b]
-    [id (name) (error "Unbound identifier: " name)]
-    [add (lhs rhs) (+ (interp lhs) (interp rhs))]
-    [mult (lhs rhs) (* (interp lhs) (interp rhs))]
-    [sub (lhs rhs) (- (interp lhs) (interp rhs))]
-    [let-expr (name val body)
-              (interp (subst name
-                             (num (interp val))
-                             body))]
-    [call-expr (fun-name arg) 'TODO]))
+(define (interp expr fundefs)
+  (local [(define (inner-interp expr)
+            (type-case Expr expr
+              [num (n) n]
+              [bool (b) b]
+              [id (name) (error "Unbound identifier: " name)]
+              [add (lhs rhs) (+ (inner-interp lhs) (inner-interp rhs))]
+              [mult (lhs rhs) (* (inner-interp lhs) (inner-interp rhs))]
+              [sub (lhs rhs) (- (inner-interp lhs) (inner-interp rhs))]
+              [let-expr (name val body)
+                        (inner-interp (subst name
+                                       (num (inner-interp val))
+                                       body))]
+              [call-expr (fun-name arg-expr)
+                         (type-case FunDef (lookup-fundef fun-name fundefs)
+                           [fundef (name arg body)
+                                   (inner-interp (subst arg
+                                                        (num (inner-interp arg-expr))
+                                                        body))])]))]
+    (inner-interp expr)))
 
-(test (interp (num 1)) 1)
-(test (interp (add (num 1) (num 2))) (+ 1 2))
-(test (interp (mult (add (num 1) (num 2)) (num 44))) (* (+ 1 2) 44))
-(test (interp (bool #t)) #t)
-(test (interp (bool #f)) #f)
-(test (interp (sub (num 1) (num 3))) -2)
-(test (interp (let-expr 'foo (num 2) (num 5))) 5)
-(test (interp (let-expr 'foo (num 5) (add (id 'foo) (num 11)))) 16)
-(test (interp (parse '(let [x (let [y 2] y)] (+ x 11)))) 13)
-(test/exn (interp (id 'fun)) "")
+(test (interp (num 1) TEST-FUNDEFS) 1)
+(test (interp (add (num 1) (num 2)) TEST-FUNDEFS) (+ 1 2))
+(test (interp (mult (add (num 1) (num 2)) (num 44)) TEST-FUNDEFS) (* (+ 1 2) 44))
+(test (interp (bool #t) TEST-FUNDEFS) #t)
+(test (interp (bool #f) TEST-FUNDEFS) #f)
+(test (interp (sub (num 1) (num 3)) TEST-FUNDEFS) -2)
+(test (interp (let-expr 'foo (num 2) (num 5)) TEST-FUNDEFS) 5)
+(test (interp (let-expr 'foo (num 5) (add (id 'foo) (num 11))) TEST-FUNDEFS) 16)
+(test (interp (parse '(let [x (let [y 2] y)] (+ x 11))) TEST-FUNDEFS) 13)
+(test (interp (parse '(bar2 3)) TEST-FUNDEFS) 99)
+(test (interp (parse '(foo 5)) TEST-FUNDEFS) 10)
+; (test (interp (parse '(bar 0)) TEST-FUNDEFS) 1) ; debug 
+(test/exn (interp (id 'fun) TEST-FUNDEFS) "")
