@@ -15,4 +15,5 @@ Below is the grammar that has been implemented in the parser so far
 	| '(' '*' <Expr> <Expr> ')'
 	| '(' 'let' '[' <id> <Expr> ']' <Expr> ')' 
 	| '(' <id> <Expr> ')'
+	| '(' 'define' '(' <id> <id> ')' <Expr> ')'
 ```
