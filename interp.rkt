@@ -49,7 +49,7 @@
                                        (num (inner-interp val))
                                        body))]
               [call-expr (fun-name arg-expr)
-                         (interp-fun fun-name arg-expr)]))
+                         (interp-call fun-name arg-expr)]))
           
           (define (interp-call name arg-expr)
             (type-case FunDef (lookup-fundef name fundefs)
